@@ -1,2 +1,5 @@
 build*/
 .cache
+
+child_image/mcuboot.conf
+priv.pem
