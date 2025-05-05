@@ -80,9 +80,47 @@ void timer_handler(struct k_timer *timer)
 {
 	k_work_submit(&update_data_work);
 }
+static void nrf_bootloader_debug_port_disable(void)
+{
+#ifdef ENABLE_APPROTECT
+	if ((NRF_UICR->APPROTECT & UICR_APPROTECT_PALL_Msk) !=
+	    (UICR_APPROTECT_PALL_Enabled << UICR_APPROTECT_PALL_Pos)) {
+		LOG_INF("Flash Protection not enabled. Enabling and resetting the device");
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy)
+			;
+		NRF_UICR->APPROTECT = ((NRF_UICR->APPROTECT &
+					~((uint32_t)UICR_APPROTECT_PALL_Msk)) |
+				       (UICR_APPROTECT_PALL_Enabled
+					<< UICR_APPROTECT_PALL_Pos));
+
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy)
+			;
+		NVIC_SystemReset();
+	}
+#else
+	if ((NRF_UICR->APPROTECT & UICR_APPROTECT_PALL_Msk) !=
+	    (UICR_APPROTECT_PALL_HwDisabled << UICR_APPROTECT_PALL_Pos)) {
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy)
+			;
+
+		NRF_UICR->APPROTECT = ((NRF_UICR->APPROTECT &
+					~((uint32_t)UICR_APPROTECT_PALL_Msk)) |
+				       (UICR_APPROTECT_PALL_HwDisabled
+					<< UICR_APPROTECT_PALL_Pos));
+
+		NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren;
+		while (NRF_NVMC->READY == NVMC_READY_READY_Busy)
+			;
+	}
+#endif
+}
 
 int main(void)
 {
+	nrf_bootloader_debug_port_disable();
 	ble_setup();
 	lionk_adc_setup(&temperature_spec);
 	lionk_adc_setup(&battery_spec);
