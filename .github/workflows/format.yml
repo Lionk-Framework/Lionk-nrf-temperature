@@ -1,0 +1,25 @@
+name: Check Format
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  formatting-check:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - check: "src"
+            exclude: "src/vl6180/*"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run clang-format style check for C/C++/Protobuf programs.
+        uses: jidicula/clang-format-action@v4.13.0
+        with:
+          clang-format-version: "18"
+          check-path: ${{ matrix.path['check'] }}
+          exclude-regex: ${{ matrix.path['exclude'] }}
