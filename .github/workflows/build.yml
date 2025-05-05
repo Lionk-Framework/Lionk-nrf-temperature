@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Export Signing Key
+        env:
+          SIGNING_KEY: ${{ secrets.BUILD_SIGNING_KEY}}
+        shell: bash
+        run: |
+          echo "$SIGNING_KEY" > key.txt
+          ./setup_mcuboot.sh key.txt
+      - name: Override mcuboot.conf with github workspace path
+        run: |
+          echo 'CONFIG_BOOT_SIGNATURE_KEY_FILE="/github/workspace/priv.pem"' > child_image/mcuboot.conf
+      - name: Build
+        uses: embedd-actions/nrf-connect-sdk-ci@v2.7.0
+        with:
+          board: nrf52840dk/nrf52840
+          build_dir: build
+      - name: Get Current Commit hash
+        id: get_commit
+        shell: bash
+        run: |
+          COMMIT_HASH=$(echo $(git rev-parse --short HEAD))
+          echo "HASH=$COMMIT_HASH" >> $GITHUB_ENV
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lionk_temp_sensor_${{ env.HASH }}
+          path: |
+            build/zephyr/app_update.bin
+            build/zephyr/merged.hex
