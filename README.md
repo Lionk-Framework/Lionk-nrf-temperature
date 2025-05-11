@@ -40,18 +40,12 @@ This procedure was tested on a Fedora 41 Host PC.
 - openssl
 - [nRF Util](https://www.nordicsemi.com/Products/Development-tools/nRF-Util)
 
-### Setup MCUBoot
+### Generate a Signing Key
 
 1. Generate a private signing key
 
 ```bash
 openssl ecparam -name prime256v1 -genkey -noout -out priv.pem
-```
-
-2. Generate the MCUBoot configuration file
-
-```bash
-./setup_mcuboot.sh priv.pem
 ```
 
 ### Build the application
