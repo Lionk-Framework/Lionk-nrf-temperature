@@ -1,8 +1,8 @@
-[![Build](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml/badge.svg)](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml)
-
 # Zephyr BLE Temperature Sensor
 
 This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic Semiconductor (nRF) devices. It reads temperature and battery level, then transmits the data via BLE. The application supports secure firmware updates over BLE and includes a bootloader with flash protection.
+
+[![Build](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml/badge.svg)](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml)
 
 ---
 
