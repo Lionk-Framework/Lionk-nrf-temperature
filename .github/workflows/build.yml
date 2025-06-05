@@ -25,7 +25,7 @@ jobs:
       - name: Build
         uses: embedd-actions/nrf-connect-sdk-ci@v2.7.0
         with:
-          board: nrf52840dk/nrf52840
+          board: nrf52840dongle/nrf52840
           build_dir: build
       - name: Get Current Commit hash
         id: get_commit
@@ -38,5 +38,4 @@ jobs:
         with:
           name: lionk_temp_sensor_${{ env.HASH }}
           path: |
-            build/zephyr/app_update.bin
-            build/zephyr/merged.hex
+            build/zephyr/zephyr.hex
