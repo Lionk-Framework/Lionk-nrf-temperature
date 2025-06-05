@@ -9,4 +9,4 @@
 /bin/bash /workdir/zephyr-sdk-${ZEPHYR_TAG}/setup.sh -c
 
 ./app/setup_mcuboot.sh /app/priv.pem
-west build --build-dir /app/build --pristine --no-sysbuild --board ${BOARD} /app
+west build --build-dir /app/build --pristine --no-sysbuild --board nrf52840dongle/nrf52840 /app
