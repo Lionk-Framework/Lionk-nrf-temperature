@@ -20,7 +20,7 @@ This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic
 
 ### Official Releases
 
-Signed firmware releases are available under [Releases](https://github.com/yourusername/your-temp-sensor-app/releases). These are verified and ready to be distributed to end devices via BLE.
+Signed firmware releases are available under [Releases](https://github.com/Lionk-Framework/Lionk-nrf-temperature/releases). These are verified and ready to be distributed to end devices via BLE.
 
 ### Intermediate Builds
 
