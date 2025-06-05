@@ -9,6 +9,7 @@
 #include <zephyr/bluetooth/services/bas.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/hwinfo.h>
+#include <zephyr/settings/settings.h>
 #include "version.h"
 
 LOG_MODULE_REGISTER(ble, LOG_LEVEL_INF);
@@ -209,8 +210,9 @@ void ble_setup(void)
 		 device_id_len);
 
 	sprintf(device_name, CONFIG_BT_DEVICE_NAME, device_id.id);
-
-	__ASSERT(bt_enable(NULL) == 0, "Couldn't enable bluetooth");
+	int err = bt_enable(NULL);
+	settings_load();
+	__ASSERT(err == 0, "Couldn't enable bluetooth");
 
 	bt_set_name(device_name);
 
