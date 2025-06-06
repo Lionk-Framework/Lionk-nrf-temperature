@@ -1,8 +1,19 @@
 # Zephyr BLE Temperature Sensor
 
-This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic Semiconductor (nRF) devices. It reads temperature and battery level, then transmits the data via BLE.
+This project is a Zephyr-based Bluetooth Low Energy (BLE) application for the Nordic Semiconductor nRF52840 dongle. It reads temperature and battery level, then transmits the data via BLE.
 
 [![Build](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml/badge.svg)](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml)
+
+---
+
+## Hardware Requirements
+
+This application is designed for and tested on the **Nordic Semiconductor nRF52840 Dongle** (PCA10059). The dongle provides:
+
+- nRF52840 SoC with Bluetooth 5.0 support
+- USB connector for power and programming
+- Built-in temperature sensor and battery monitoring capabilities
+- Compact form factor suitable for IoT applications
 
 ---
 
