@@ -20,21 +20,29 @@ K_TIMER_DEFINE(work_timer, timer_handler, NULL);
 sensor_data_t sensor_data;
 static sensor_state_t state = DISCONNECTED;
 
-static int64_t last_payload_ts = 0;
-/* Get the ADC device node identifier */
-#define ADC_NODE DT_NODELABEL(adc)
+static const struct gpio_dt_spec temp_resistor_div_en =
+	GPIO_DT_SPEC_GET(DT_ALIAS(resistordiven0), gpios);
+static const struct gpio_dt_spec battery_resistor_div_en =
+	GPIO_DT_SPEC_GET(DT_ALIAS(resistordiven1), gpios);
 
 static const struct adc_dt_spec temperature_spec =
 	ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
-//ADC_DT_SPEC_GET_BY_IDX(ADC_NODE, 0);
 
 static const struct adc_dt_spec battery_spec =
 	ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 1);
 
 void update_data(void)
 {
+	gpio_pin_set_dt(&temp_resistor_div_en, 1);
+	gpio_pin_set_dt(&battery_resistor_div_en, 1);
+
+	k_msleep(10);
+
 	uint16_t temp_read_mv = lionk_adc_do_read(&temperature_spec);
 	uint16_t battery_read = lionk_adc_do_read(&battery_spec);
+
+	gpio_pin_set_dt(&temp_resistor_div_en, 0);
+	gpio_pin_set_dt(&battery_resistor_div_en, 0);
 
 	sensor_data.temperature = temp_read_mv - 500;
 	sensor_data.battery_mv = battery_read * 4;
@@ -66,9 +74,7 @@ void do_work(struct k_work *work)
 
 		if (ble_is_subscribed()) {
 			const int ret = ble_send_data();
-			if (ret == 0) {
-				last_payload_ts = k_uptime_get();
-			} else {
+			if (ret) {
 				LOG_ERR("Couldn't send data (%d)", ret);
 			}
 		}
@@ -120,7 +126,37 @@ static void nrf_bootloader_debug_port_disable(void)
 
 int main(void)
 {
+	int ret;
+
 	nrf_bootloader_debug_port_disable();
+
+	if (!gpio_is_ready_dt(&temp_resistor_div_en)) {
+		LOG_ERR("GPIO device %s is not ready",
+			temp_resistor_div_en.port->name);
+		return -1;
+	}
+	if (!gpio_is_ready_dt(&battery_resistor_div_en)) {
+		LOG_ERR("GPIO device %s is not ready",
+			battery_resistor_div_en.port->name);
+		return -1;
+	}
+
+	ret = gpio_pin_configure_dt(&temp_resistor_div_en,
+				    GPIO_OUTPUT_INACTIVE);
+	if (ret < 0) {
+		LOG_ERR("Cannot configure GPIO pin for temperature resistor divider");
+		return -1;
+	}
+
+	ret = gpio_pin_configure_dt(&battery_resistor_div_en,
+				    GPIO_OUTPUT_INACTIVE);
+	if (ret < 0) {
+		LOG_ERR("Cannot configure GPIO pin for battery resistor divider");
+		return -1;
+	}
+
+	LOG_INF("GPIO pins configured for resistor divider control");
+
 	ble_setup();
 	lionk_adc_setup(&temperature_spec);
 	lionk_adc_setup(&battery_spec);

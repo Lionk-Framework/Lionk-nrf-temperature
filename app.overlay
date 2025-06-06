@@ -2,6 +2,23 @@
 	zephyr,user {
 		io-channels = <&adc 0>, <&adc 1>;
 	};
+
+	aliases {
+		resistordiven0 = &temp_resistor_div_en;
+		resistordiven1 = &battery_resistor_div_en;
+	};
+
+	gpio_pins {
+		compatible = "gpio-leds";
+		temp_resistor_div_en: temp_resistor_div_en {
+			gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+			label = "Temperature Resistor Divider Enable";
+		};
+		battery_resistor_div_en: battery_resistor_div_en {
+			gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+			label = "Battery Resistor Divider Enable";
+		};
+	};
 };
 
 &adc {
