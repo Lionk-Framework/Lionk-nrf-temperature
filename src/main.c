@@ -31,6 +31,13 @@ static const struct adc_dt_spec temperature_spec =
 static const struct adc_dt_spec battery_spec =
 	ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 1);
 
+/**
+ * @brief Updates sensor data by reading temperature and battery values
+ * 
+ * This function enables the resistor dividers, waits for voltage stabilization,
+ * reads ADC values for temperature and battery, then disables the resistor
+ * dividers to save power. The raw ADC values are converted to meaningful units.
+ */
 void update_data(void)
 {
 	gpio_pin_set_dt(&temp_resistor_div_en, 1);
@@ -48,8 +55,18 @@ void update_data(void)
 	sensor_data.battery_mv = battery_read * 4;
 }
 
+/**
+ * @brief Main work function that handles sensor updates and BLE state management
+ * 
+ * This function is called periodically by the timer. It updates sensor data,
+ * logs the values, and manages the BLE connection state machine (disconnected,
+ * advertising, connected). When connected and subscribed, it sends sensor data.
+ * 
+ * @param work Pointer to the work structure (unused)
+ */
 void do_work(struct k_work *work)
 {
+	(void)work;
 	update_data();
 	LOG_INF("Temperature: %d, battery %d", sensor_data.temperature,
 		sensor_data.battery_mv);
@@ -82,10 +99,27 @@ void do_work(struct k_work *work)
 	}
 }
 
+/**
+ * @brief Timer callback function that submits work to the system work queue
+ * 
+ * This function is called every second by the timer and submits the sensor
+ * update work to be processed by the system work queue.
+ * 
+ * @param timer Pointer to the timer structure (unused)
+ */
 void timer_handler(struct k_timer *timer)
 {
 	k_work_submit(&update_data_work);
 }
+
+/**
+ * @brief Configures flash protection settings for the nRF device
+ * 
+ * This function enables or disables flash protection (APPROTECT) based on the
+ * ENABLE_APPROTECT configuration. It modifies the UICR (User Information 
+ * Configuration Registers) and performs a system reset if changes are made.
+ * This protects the flash memory from unauthorized access.
+ */
 static void nrf_bootloader_debug_port_disable(void)
 {
 #ifdef ENABLE_APPROTECT
@@ -124,6 +158,19 @@ static void nrf_bootloader_debug_port_disable(void)
 #endif
 }
 
+/**
+ * @brief Main application entry point
+ * 
+ * This function initializes the system by:
+ * - Configuring flash protection settings
+ * - Setting up GPIO pins for resistor divider control
+ * - Initializing BLE functionality
+ * - Configuring ADC channels for temperature and battery monitoring
+ * - Starting a periodic timer for sensor updates
+ * - Entering an infinite sleep state (work is handled by interrupts)
+ * 
+ * @return Should never return; exits with error code if initialization fails
+ */
 int main(void)
 {
 	int ret;
