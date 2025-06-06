@@ -38,7 +38,7 @@ This procedure was tested on a Fedora 41 Host PC.
 
 - [Docker](https://docs.docker.com/get-started/get-docker/)
 - openssl
-- [nRF Util](https://www.nordicsemi.com/Products/Development-tools/nRF-Util)
+- [nRF Util](https://www.nordicsemi.com/Products/Development-tools/nRF-Util) with `nrf5sdk-tools` installed
 
 ### Generate a Signing Key
 
@@ -67,15 +67,29 @@ docker run -it -v $(pwd):/app nrf-connect-sdk
 
 3. Inside `build/zephyr` you'll find:
 
-- `merged.hex` - Contains the bootloader and the main application 
-    - Use this one with `nrfjprog` when first setting up your board
-- `app_update.bin` - Contains the main application
-    - Use this to update your application using [nRF Connect](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-mobile) for instance
+- `zephyr.hex` - Contains the main application
 
-### Flash the application 
+### Create the application package
 
 ```bash
-nrfjprog --recover -r --program build/zephyr/merged.hex
+nrfutil nrf5sdk-tools pkg generate \
+  --key-file priv.pem \
+  --hw-version 52 \
+  --sd-req=0x00 \
+  --application build/zephyr/zephyr.hex \
+  --application-version 1 \
+  app_dfu_package.zip
+```
+
+### Flash the application
+
+> [!IMPORTANT]
+> Make sure the dongle is in DFU mode by pressing the reset button while powered.
+
+The following command assumes you can see the dongle in `/dev/ttyACM0`:
+
+```bash
+nrfutil nrf5sdk-tools dfu usb-serial -pkg app_dfu_package.zip -p /dev/ttyACM0
 ```
 
 ### Upgrade the application
