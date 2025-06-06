@@ -1,6 +1,6 @@
 # Zephyr BLE Temperature Sensor
 
-This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic Semiconductor (nRF) devices. It reads temperature and battery level, then transmits the data via BLE. The application supports secure firmware updates over BLE and includes a bootloader with flash protection.
+This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic Semiconductor (nRF) devices. It reads temperature and battery level, then transmits the data via BLE.
 
 [![Build](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml/badge.svg)](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions/workflows/build.yml)
 
@@ -9,22 +9,21 @@ This project is a Zephyr-based Bluetooth Low Energy (BLE) application for Nordic
 ## Features
 
 - BLE temperature and battery level service
-- Bootloader with flash protection
-- Secure firmware updates with signed images (via BLE)
-- CI pipeline to sign and validate updates
+- Lightweight application optimized for flash-constrained devices
+- CI pipeline for automated builds
 - Artifacts and releases available via GitHub Actions and Releases
 
 ---
 
-## Firmware Updates
+## Firmware
 
 ### Official Releases
 
-Signed firmware releases are available under [Releases](https://github.com/Lionk-Framework/Lionk-nrf-temperature/releases). These are verified and ready to be distributed to end devices via BLE.
+Firmware releases are available under [Releases](https://github.com/Lionk-Framework/Lionk-nrf-temperature/releases). These are ready to be flashed to devices.
 
 ### Intermediate Builds
 
-CI-generated builds are available in the **GitHub Actions Artifacts** section. Always ensure you're using signed binaries before distributing.
+CI-generated builds are available in the **GitHub Actions Artifacts** section.
 
 - [Latest CI Artifact Build](https://github.com/Lionk-Framework/Lionk-nrf-temperature/actions?query=workflow%3A%22Build%22)
 
@@ -99,11 +98,11 @@ to upgrade your application using your PC.
 
 ---
 
-## Security
+## Notes
 
-* Flash protection is enabled through the bootloader configuration.
-* All firmware images must be signed before being accepted by the bootloader.
-* CI ensures all updates are signed with a trusted key.
+* This application has been optimized for flash-constrained devices
+* Bootloader and DFU functionality have been removed to reduce flash usage
+* For firmware updates, the device must be reprogrammed using external tools
 
 ---
 
