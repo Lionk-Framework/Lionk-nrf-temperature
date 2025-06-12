@@ -41,7 +41,7 @@ static const struct adc_dt_spec battery_spec =
 void update_data(void)
 {
 	gpio_pin_set_dt(&temp_resistor_div_en, 1);
-	gpio_pin_set_dt(&battery_resistor_div_en, 1);
+	gpio_pin_set_dt(&battery_resistor_div_en, 0);
 
 	k_msleep(10);
 
@@ -49,7 +49,7 @@ void update_data(void)
 	uint16_t battery_read = lionk_adc_do_read(&battery_spec);
 
 	gpio_pin_set_dt(&temp_resistor_div_en, 0);
-	gpio_pin_set_dt(&battery_resistor_div_en, 0);
+	gpio_pin_set_dt(&battery_resistor_div_en, 1);
 
 	sensor_data.temperature = temp_read_mv - 500;
 	sensor_data.battery_mv = battery_read * 4;
